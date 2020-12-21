@@ -1,0 +1,90 @@
+::selection {
+    background-color: black;
+}
+body {
+    background-color: #1d1d1d;
+}
+.container {
+    width: 100%;
+    height: 100vh;
+    background-color: #1d1d1d;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 300;
+}
+.titleContainer {
+    position: relative;
+    height: 25%;
+}
+.calCon {
+    position: relative;
+    width: 100%;
+    height: 90%;
+    display: flex;
+    justify-content: center;
+}
+.title {
+    position: absolute;
+    top: -70px;
+    left: 11%;
+    font-size: 50px;
+    font-weight: 400;
+    vertical-align: middle;
+    color: rgba(255, 255, 255, 0.76)
+}
+.year {
+    position: absolute;
+    top: -105px;
+    right: 10%;
+    font-size: 95px;
+    font-weight: 500;
+    vertical-align: middle;
+    color: rgb(14, 14, 14)
+}
+.year .arrow {
+    font-size: 35px;
+    padding-bottom: 10px;
+    padding: 10px 15px;
+    color: rgb(14, 14, 14)
+}
+.year .arrow:hover {
+    color:rgba(255, 255, 255, 0.158);
+    cursor: pointer;
+}
+.calTable {
+    width: 80%;
+    height: 85%;
+    border: 2px solid black;
+    border-collapse: separate;
+    border-spacing: 0px;
+    border-radius: 5px;
+    background-color: black;
+    box-shadow: 5px 5px 0px 0px rgba(0, 0, 0, 0.74);
+}
+.dayRow {
+    height: 5%;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.753);
+    border: 1px solid black;
+    background-color: #1d1d1d;
+}
+.dayRow td {
+    width: 10%;
+    border-radius: 5px;
+    border: 1px solid black;
+    vertical-align: middle;
+}
+.dateRow {
+    height: 10%;
+    text-align: center;
+    background-color: #1d1d1d;
+}
+.dateRow td {
+    width: 10%;
+    border-radius: 5px;
+    border: 1px solid black;
+    vertical-align: middle;
+}
+.dateRow td:hover {
+    background-color: rgba(255, 255, 255, 0.034);
+    cursor: pointer;
+}
