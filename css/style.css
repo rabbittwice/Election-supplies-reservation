@@ -123,11 +123,6 @@ body {
     font-weight: 400;
     text-align: start;
 }
-/* td 안에 div를 추가해서 표 세로폭이 변하지 않도록 고정 */
-.list {
-    height: 110px;
-    overflow: hidden;
-}
 .date {
     padding-bottom: 5px;
 }
