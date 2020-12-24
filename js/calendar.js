@@ -64,6 +64,7 @@
         if (!lastTr) {
             calTable.removeChild(calTable.lastChild);
         }
+        _setOpenModal();
     }
 
 
@@ -101,6 +102,7 @@
         }
         _makeCalendar();
         _showYearMonth();
+        
     };
 
     function _yearDown() {
@@ -141,4 +143,42 @@
         _makeCalendar();
         _showYearMonth();
     }
+
+
+    // 모달창
+
+    // 달력 클릭 시 이벤트
+    const modalContainer = document.querySelector('.dark');
+    const clickedDate = document.querySelector('.clickedDate');
+    
+    _setOpenModal();
+
+    function _setOpenModal() {
+        const dateColumn = document.querySelectorAll('.dateColumn');
+        for(let i = 0; i < dateColumn.length; i++){
+            if(dateColumn[i].innerHTML){
+                dateColumn[i].addEventListener('click', _openModal);
+            }
+        }
+    }
+
+    function _openModal(e) {
+        let nowYear = today.getFullYear();
+        let nowMonth = today.getMonth() + 1;
+        modalContainer.classList.add('opened');
+        clickedDate.innerHTML = nowYear + '년 ' + nowMonth + '월 ' + e.target.innerText + '일 예약 목록';
+        console.log(e.target.innerText);
+    }
+
+    // close 버튼
+    const closeBtn = document.querySelector('.close');
+
+    closeBtn.addEventListener('click', _closeModal);
+
+    function _closeModal() {
+        modalContainer.classList.remove('opened');
+    }
+    
+
 }())
+
