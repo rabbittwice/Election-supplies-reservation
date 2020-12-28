@@ -267,9 +267,13 @@
     function _activeDelete(btn, listCon){
         
         btn.addEventListener('click', function(e){
-            console.dir(e.target);
-            listCon.removeChild(e.target.parentNode);
-        });
+            if(e.target.nodeName == 'DIV'){
+                listCon.removeChild(e.target.parentNode);
+            } else {
+                listCon.removeChild(e.target.parentNode.parentNode.parentNode);
+
+            }
+        })
     }
 
     
