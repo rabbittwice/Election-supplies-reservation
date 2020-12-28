@@ -18,8 +18,25 @@
         <div class="dark">
             <div class="modal">
                 <div class="clickedDate"></div>
-                <div class="listContainer"></div>
+                <div class="listContainer">
+                    <!-- <div class="resList">
+                        <div class="resName">용봉휴먼2차APT</div>
+                        <div class="count"><p class="resKind">(구)</p> 기표대:<p class="resCount">0</p>개, 투표함: <p class="resBoxCount">2</p>개</div>
+                        <div class="resDate">반납예정일: <p class="returnDate">2020-10-12</p></div>
+                        <div class="deleteBtn"><i class="fas fa-trash-alt"></i></div>
+                    </div> -->
+                </div>
                 <div class="nameContainer">기관명 <input type="text" name="orgName" id="orgName"></div>
+                <div class="kindContainer">기표대 
+                    <div class="inputArea">
+                        <label for="kind1">구형</label><input type="radio" name="kind" id="kind1" checked>
+                        <label for="kind2">신형</label><input type="radio" name="kind" id="kind2">
+                        <input type="number" name="count" id="count" min=0 value=0>개
+                    </div>
+                </div>
+                <div class="boxContainer">투표함 <input type="number" name="boxCount" id="boxCount" min=0 value=0>개</div>
+                <div class="returnContainer">반납일 <input type="date" name="returnDate" id="returnDate"></div>
+                <div class="submitBtn">입력</div>
                 <div class="close"><i class="fas fa-window-close"></i></div>
             </div>
         </div>

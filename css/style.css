@@ -151,7 +151,7 @@ body {
     display: flex;
 }
 .clickedDate {
-    padding: 12px 20px;
+    padding: 15px 20px;
     font-size: 20px;
     font-weight: 500;
     color: #ffffff;
@@ -159,16 +159,72 @@ body {
 .listContainer {
     position: absolute;
     left: 20px;
-    top: 47px;
+    top: 52px;
     width: 60%;
-    height: 85%;
-    border-radius: 10px;
-    background-color: #ffffffef;
+    height: 83%;
+    padding-top: 10px;
+    padding-left: 18px;
+    border-radius: 5px;
+    background-color: #ffffff;
+    overflow-y: scroll;
+}
+.resList {
+    position: relative;
+    width: 91%;
+    height: 17%;
+    margin-bottom: 10px;
+    padding: 10px 10px;
+    border: 1px rgba(0, 0, 0, 0.74) solid;
+    border-radius: 8px;
+    box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 0.74);
+    color: black;
+}
+.resName {
+    font-weight: 500;
+    color:rgb(255, 0, 0);
+}
+.resList .count {
+    margin-top: 10px;
+    display: flex;
+    width: 50%;
+    height: 20px;
+}
+.resCount, .resBoxCount {
+    margin-left: 4px;
+    font-weight: 500;
+}
+.resDate {
+    display: flex;
+}
+.resDate .returnDate {
+    margin-left: 4px;
+    font-weight: 500;
+}
+.deleteBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10%;
+    height: 100%;
+    border-radius: 0 6px 6px 0;
+    border-left: 1px solid rgba(0, 0, 0, 0.24);
+    color: rgba(0, 0, 0, 0.158);
+    cursor: pointer;
+    transition: ease-in;
+    transition-duration: 0.1s;
+}
+.deleteBtn:hover {
+    border-left: 0px solid;
+    background-color: rgba(255, 0, 0, 0.671);
+    color: white;
 }
 .nameContainer {
     position: absolute;
     top: 20%;
-    right: 5%;
+    right: 3%;
     width: 28%;
     height: 30px;
     color: white;
@@ -176,10 +232,61 @@ body {
     font-weight: 500;
 }
 .nameContainer input {
-    margin-left: 5px;
+    position: absolute;
+    margin-left: 7px;
     width: 58%;
     height: 58%;
     border-radius: 5px;
+    border: 0px;
+}
+.kindContainer {
+    position: absolute;
+    top: 30%;
+    right: 3%;
+    width: 28%;
+    height: 30px;
+    color: white;
+    font-size: 20px;
+    font-weight: 500;
+}
+.kindContainer .inputArea {
+    position: absolute;
+    top: 0;
+    left: 63px;
+    width: 55%;
+    height: 180%;
+    padding: 5px 5px;
+    border-radius: 5px;
+    font-size: 17px;
+    color: black;
+    background-color: white;
+}
+.kindContainer input {
+    width: 10%;
+    margin-bottom: 7px;
+}
+#count {
+    width: 25%;
+    margin-top: 5px;
+    margin-right: 5px;
+}
+.boxContainer {
+    position: absolute;
+    top: 48%;
+    right: 3%;
+    width: 28%;
+    height: 30px;
+    color: white;
+    font-size: 20px;
+    font-weight: 500;
+}
+.boxContainer input {
+    margin-left: 2.5px;
+    margin-right: 4px;
+    width: 16%;
+    height: 70%;
+    border-radius: 5px;
+    border: 0px;
 }
 .close {
     position: absolute;
@@ -188,6 +295,40 @@ body {
     font-size: 30px;
     color:#5757579c;
     cursor: pointer;
+}
+.returnContainer {
+    position: absolute;
+    top: 58%;
+    right: 3%;
+    width: 28%;
+    height: 30px;
+    color: white;
+    font-size: 20px;
+    font-weight: 400;
+}
+.returnContainer input {
+    width: 59%;
+}
+.submitBtn {
+    position: absolute;
+    bottom: 6.5%;
+    right: 5%;
+    width: 40px;
+    height: 20px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    border: 2px solid white;
+    padding: 2px 2px;
+    border-radius: 5px;
+    font-size: 17px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: ease-in;
+    transition-duration: 0.1s;
+}
+.submitBtn:hover {
+    color: rgb(0, 0, 0);
+    background-color: rgb(255, 255, 255);
 }
 .close:hover {
     color: rgba(255, 255, 255, 0.808);
