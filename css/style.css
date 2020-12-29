@@ -126,6 +126,9 @@ body {
 .date {
     padding-bottom: 5px;
 }
+.dateColumn .list {
+    padding-bottom: 5px;
+}
 .dateRow td:hover {
     background-color: rgba(255, 255, 255, 0.034);
     cursor: pointer;

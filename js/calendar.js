@@ -168,9 +168,17 @@
         let nowYear = today.getFullYear();
         let nowMonth = today.getMonth() + 1;
         modalContainer.classList.add('opened');
-        clickedDate.innerHTML = nowYear + '년 ' + nowMonth + '월 ' + e.target.innerText + '일';
+        if (e.target.className == 'dateColumn') {
+            clickedDate.innerHTML = nowYear + '년 ' + nowMonth + '월 ' + e.target.childNodes[0].innerText + '일';
+            returnDate.value = today.toISOString().substring(0, 8) + (e.target.childNodes[0].innerText.length == 1 ? '0' + e.target.childNodes[0].innerText : e.target.childNodes[0].innerText);
+        } else if (e.target.className == 'date') {
+            clickedDate.innerHTML = nowYear + '년 ' + nowMonth + '월 ' + e.target.innerText + '일';
+            returnDate.value = today.toISOString().substring(0, 8) + (e.target.innerText.length == 1 ? '0' + e.target.innerText : e.target.innerText);
+        } else if (e.target.className == 'list') {
+            clickedDate.innerHTML = nowYear + '년 ' + nowMonth + '월 ' + e.target.parentNode.childNodes[0].innerText + '일';
+            returnDate.value = today.toISOString().substring(0, 8) + (e.target.parentNode.childNodes[0].innerText.length == 1 ? '0' + e.target.parentNode.childNodes[0].innerText : e.target.parentNode.childNodes[0].innerText);
+        }
         orgName.focus();
-        returnDate.value = today.toISOString().substring(0, 8) + (e.target.innerText.length == 1? '0' + e.target.innerText : e.target.innerText);
     }
 
     // close 버튼 & esc 키
@@ -211,9 +219,9 @@
     submitBtn.addEventListener('click', function(e){
         const date = e.path[1].childNodes[1].innerText
         const theDate = date.substring(date.lastIndexOf('월') + 2, date.lastIndexOf('일'));
-        const objName = orgName.value;
 
         if(orgName.value){
+            // modal 창에 추가
             const reservedList = new Reserved(orgName.value, today.toISOString().substring(0, 8) + theDate, (kind1.checked ? '(구)' : '(신)'), count.value, boxCount.value, returnDate.value);
 
             const listElement = document.createElement('div');
@@ -254,8 +262,37 @@
             listContainer.appendChild(listElement);
 
             _activeDelete(deleteBtn, listContainer);
+
+            // 메인 달력에 추가
+            _addMain(reservedList.date, reservedList.name, reservedList.count, reservedList.boxCount);
         }
     })
+
+    // 메인 달력에 추가하는 함수
+    function _addMain(date, name, count, boxCount){
+        // 인수로 날짜를 받아서 메인 달력의 해당 날짜에 추가되도록 함.
+        const dateRow = document.querySelectorAll('.dateRow')
+        const theDate = date.substring(8, 10);
+    
+        for (let i = 0; i < 5; i++){
+            for (let j = 0; j < 7; j++){
+                if(dateRow[i].children[j].childNodes[0]){
+                    if (dateRow[i].children[j].childNodes[0].innerText == theDate){
+                        const correctElement = dateRow[i].children[j].childNodes[0];
+                        const list = document.createElement('div');
+                        list.classList.add('list');
+                        list.innerHTML = name + '<br>기표대 ' + count + '개 <br>투표함' + boxCount + '개'
+                        correctElement.parentNode.appendChild(list);
+                    }
+                }
+            }
+        }
+        
+
+
+    }
+
+
 
     // delete 버튼 누를 시 해당 리스트 삭제
     const listDelete = document.querySelector('.deleteBtn');
