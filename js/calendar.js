@@ -261,7 +261,7 @@
             
             listContainer.appendChild(listElement);
 
-            _activeDelete(deleteBtn, listContainer);
+            _activeDelete(deleteBtn, listContainer, reservedList.date, reservedList.name);
 
             // 메인 달력에 추가
             _addMain(reservedList.date, reservedList.name, reservedList.count, reservedList.boxCount);
@@ -281,7 +281,7 @@
                         const correctElement = dateRow[i].children[j].childNodes[0];
                         const list = document.createElement('div');
                         list.classList.add('list');
-                        list.innerHTML = name + '<br>기표대 ' + count + '개 <br>투표함' + boxCount + '개'
+                        list.innerHTML = name + '<br>-기표대 ' + count + '개 <br>-투표함' + boxCount + '개'
                         correctElement.parentNode.appendChild(list);
                     }
                 }
@@ -301,8 +301,11 @@
         _activeDelete(listDelete);
     }
     
-    function _activeDelete(btn, listCon){
+    function _activeDelete(btn, listCon, date, name){
         
+        const dateRow = document.querySelectorAll('.dateRow')
+        const theDate = date.substring(8, 10);
+
         btn.addEventListener('click', function(e){
             if(e.target.nodeName == 'DIV'){
                 listCon.removeChild(e.target.parentNode);
@@ -310,7 +313,22 @@
                 listCon.removeChild(e.target.parentNode.parentNode.parentNode);
 
             }
+            for (let i = 0; i < 5; i++){
+                for (let j = 0; j < 7; j++){
+                    if(dateRow[i].children[j].childNodes[0]){
+                        if (dateRow[i].children[j].childNodes[0].innerText == theDate){
+                            for (let h = 0; h < dateRow[i].children[j].childNodes.length; h++){
+                                if (dateRow[i].children[j].childNodes[h].innerText.includes(name)){
+                                    dateRow[i].children[j].removeChild(dateRow[i].children[j].childNodes[h]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         })
+
+
     }
 
     
