@@ -102,7 +102,7 @@
         }
         _makeCalendar();
         _showYearMonth();
-        
+
     };
 
     function _yearDown() {
@@ -152,13 +152,13 @@
     const clickedDate = document.querySelector('.clickedDate');
     const orgName = document.getElementById('orgName');
     const returnDate = document.getElementById('returnDate');
-    
+
     _setOpenModal();
 
     function _setOpenModal() {
         const dateColumn = document.querySelectorAll('.dateColumn');
-        for(let i = 0; i < dateColumn.length; i++){
-            if(dateColumn[i].innerHTML){
+        for (let i = 0; i < dateColumn.length; i++) {
+            if (dateColumn[i].innerHTML) {
                 dateColumn[i].addEventListener('click', _openModal);
             }
         }
@@ -189,16 +189,16 @@
     function _closeModal() {
         modalContainer.classList.remove('opened');
     }
-    
-    window.addEventListener('keydown', function(e){
-        if(e.key == "Escape"){
+
+    window.addEventListener('keydown', function (e) {
+        if (e.key == "Escape") {
             _closeModal();
         }
     })
 
     // submit 버튼 눌렀을 때 이벤트 & 객체 생성
 
-    function Reserved(name, date, kind, count, boxCount, returnDate){
+    function Reserved(name, date, kind, count, boxCount, returnDate) {
         this.name = name;
         this.date = date;
         this.kind = kind;
@@ -209,19 +209,17 @@
 
     const submitBtn = document.querySelector('.submitBtn');
     const kind1 = document.getElementById('kind1');
-    const kind2 = document.getElementById('kind2');
     const count = document.getElementById('count');
     const boxCount = document.getElementById('boxCount');
     const listContainer = document.querySelector('.listContainer');
-    
 
 
-    submitBtn.addEventListener('click', function(e){
-        const date = e.path[1].childNodes[1].innerText
-        const theDate = date.substring(date.lastIndexOf('월') + 2, date.lastIndexOf('일'));
+    submitBtn.addEventListener('click', _submitClick);
 
-        if(orgName.value){
+    function _submit(date) {
+        if (orgName.value) {
             // modal 창에 추가
+            const theDate = date.substring(date.lastIndexOf('월') + 2, date.lastIndexOf('일'));
             const reservedList = new Reserved(orgName.value, today.toISOString().substring(0, 8) + theDate, (kind1.checked ? '(구)' : '(신)'), count.value, boxCount.value, returnDate.value);
 
             const listElement = document.createElement('div');
@@ -258,7 +256,7 @@
             listElement.appendChild(countElement);
             listElement.appendChild(resDate);
             listElement.appendChild(deleteBtn);
-            
+
             listContainer.appendChild(listElement);
 
             _activeDelete(deleteBtn, listContainer, reservedList.date, reservedList.name);
@@ -266,18 +264,53 @@
             // 메인 달력에 추가
             _addMain(reservedList.date, reservedList.name, reservedList.count, reservedList.boxCount);
         }
-    })
+    }
+
+
+    function _submitClick(e) {
+
+        if (e.type == 'click') {
+            const date = e.path[1].childNodes[1].innerText;
+            _submit(date);
+        } else if (e.type == 'keydown') {
+            for (let i = 0; i < e.path.length; i++) {
+                if (e.path[i].className == 'modal') {
+                    const date = e.path[i].childNodes[1].innerText;
+                    _submit(date);
+                };
+            };
+        };
+    }     
+        
+    // modal 창에서 enter 키 누를 시 입력되도록
+
+    const modal = document.querySelector('.modal');
+
+    modal.addEventListener('keydown', function (e) {
+        if (e.keyCode == 13) {
+            for (let i = 0; i < e.path.length; i++) {
+                if (e.path[i].className == 'modal') {
+                    for (let j = 0; j < e.path[i].childNodes.length; j++)
+                    if (e.path[i].childNodes[j].className == 'submitBtn'){
+                        _submitClick(e);
+                    }
+                }
+            }
+        }
+    });
+
+
 
     // 메인 달력에 추가하는 함수
-    function _addMain(date, name, count, boxCount){
+    function _addMain(date, name, count, boxCount) {
         // 인수로 날짜를 받아서 메인 달력의 해당 날짜에 추가되도록 함.
         const dateRow = document.querySelectorAll('.dateRow')
         const theDate = date.substring(8, 10);
-    
-        for (let i = 0; i < 5; i++){
-            for (let j = 0; j < 7; j++){
-                if(dateRow[i].children[j].childNodes[0]){
-                    if (dateRow[i].children[j].childNodes[0].innerText == theDate){
+
+        for (let i = 0; i < 5; i++) {
+            for (let j = 0; j < 7; j++) {
+                if (dateRow[i].children[j].childNodes[0]) {
+                    if (dateRow[i].children[j].childNodes[0].innerText == theDate) {
                         const correctElement = dateRow[i].children[j].childNodes[0];
                         const list = document.createElement('div');
                         list.classList.add('list');
@@ -287,9 +320,6 @@
                 }
             }
         }
-        
-
-
     }
 
 
@@ -297,28 +327,30 @@
     // delete 버튼 누를 시 해당 리스트 삭제
     const listDelete = document.querySelector('.deleteBtn');
 
-    if(listDelete){
+    if (listDelete) {
         _activeDelete(listDelete);
     }
-    
-    function _activeDelete(btn, listCon, date, name){
-        
+
+    function _activeDelete(btn, listCon, date, name) {
+
         const dateRow = document.querySelectorAll('.dateRow')
         const theDate = date.substring(8, 10);
 
-        btn.addEventListener('click', function(e){
-            if(e.target.nodeName == 'DIV'){
+        btn.addEventListener('click', function (e) {
+            if (e.target.nodeName == 'DIV') {
                 listCon.removeChild(e.target.parentNode);
-            } else {
+            } else if (e.target.nodeName == 'svg'){
+                listCon.removeChild(e.target.parentNode.parentNode);
+            } else if (e.target.nodeName == 'path'){
                 listCon.removeChild(e.target.parentNode.parentNode.parentNode);
-
             }
-            for (let i = 0; i < 5; i++){
-                for (let j = 0; j < 7; j++){
-                    if(dateRow[i].children[j].childNodes[0]){
-                        if (dateRow[i].children[j].childNodes[0].innerText == theDate){
-                            for (let h = 0; h < dateRow[i].children[j].childNodes.length; h++){
-                                if (dateRow[i].children[j].childNodes[h].innerText.includes(name)){
+
+            for (let i = 0; i < 5; i++) {
+                for (let j = 0; j < 7; j++) {
+                    if (dateRow[i].children[j].childNodes[0]) {
+                        if (dateRow[i].children[j].childNodes[0].innerText == theDate) {
+                            for (let h = 0; h < dateRow[i].children[j].childNodes.length; h++) {
+                                if (dateRow[i].children[j].childNodes[h].innerText.includes(name)) {
                                     dateRow[i].children[j].removeChild(dateRow[i].children[j].childNodes[h]);
                                 }
                             }
@@ -331,7 +363,8 @@
 
     }
 
-    
+
+
 
 }())
 
