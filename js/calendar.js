@@ -263,6 +263,13 @@
 
             // 메인 달력에 추가
             _addMain(reservedList.date, reservedList.name, reservedList.count, reservedList.boxCount);
+
+            // Input 초기화
+
+            orgName.value = '';
+            kind1.checked = true;
+            count.value = 0;
+            boxCount.value = 0;
         }
     }
 
