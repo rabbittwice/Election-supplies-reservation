@@ -4,6 +4,11 @@
 
     _makeCalendar();
 
+    function _saveToStorage(arr) {
+        localStorage.setItem('arrOfObj', JSON.stringify(arr));
+    }
+
+
     function _makeCalendar() {
         let nowYear = today.getFullYear();
         const nowMonth = today.getMonth() + 1;
@@ -198,6 +203,8 @@
 
     // submit 버튼 눌렀을 때 이벤트 & 객체 생성
 
+    const arrOfObj = [];
+
     function Reserved(name, date, kind, count, boxCount, returnDate) {
         this.name = name;
         this.date = date;
@@ -205,6 +212,7 @@
         this.count = count;
         this.boxCount = boxCount;
         this.returnDate = returnDate;
+        this.id = uuidv4();
     }
 
     const submitBtn = document.querySelector('.submitBtn');
@@ -218,60 +226,36 @@
 
     function _submit(date) {
         if (orgName.value) {
-            // modal 창에 추가
+            // 객체 생성
             const theDate = date.substring(date.lastIndexOf('월') + 2, date.lastIndexOf('일'));
             const reservedList = new Reserved(orgName.value, today.toISOString().substring(0, 8) + theDate, (kind1.checked ? '(구)' : '(신)'), count.value, boxCount.value, returnDate.value);
 
-            const listElement = document.createElement('div');
-            listElement.classList.add('resList');
-            const resName = document.createElement('div');
-            resName.classList.add('resName');
-            const countElement = document.createElement('div');
-            countElement.classList.add('count');
-            const resKind = document.createElement('p');
-            resKind.classList.add('resKind')
-            const resCount = document.createElement('p');
-            resCount.classList.add('resCount');
-            const resBoxCount = document.createElement('p');
-            resBoxCount.classList.add('resBoxCount');
-            const resDate = document.createElement('div');
-            resDate.classList.add('resDate');
-            const returnDateElement = document.createElement('p');
-            returnDateElement.classList.add('returnDate');
-            const deleteBtn = document.createElement('div');
-            deleteBtn.classList.add('deleteBtn');
+            // 객체 배열에 추가 후 localStorage에 저장
+            arrOfObj.push(reservedList);
 
-
-            deleteBtn.innerHTML = '<i class="fas fa-trash-alt"></i>';
-            returnDateElement.innerText = reservedList.returnDate;
-            resDate.innerHTML = '반납예정일: ' + returnDateElement.outerHTML;
-            resKind.innerText = reservedList.kind;
-            resCount.innerText = reservedList.count;
-            resBoxCount.innerText = reservedList.boxCount;
-            countElement.innerHTML = resKind.outerHTML + '기표대:' + resCount.outerHTML + '개, 투표함:' + resBoxCount.outerHTML + '개';
-            resName.innerText = reservedList.name;
-
-
-            listElement.appendChild(resName);
-            listElement.appendChild(countElement);
-            listElement.appendChild(resDate);
-            listElement.appendChild(deleteBtn);
-
-            listContainer.appendChild(listElement);
-
-            _activeDelete(deleteBtn, listContainer, reservedList.date, reservedList.name);
-
-            // 메인 달력에 추가
-            _addMain(reservedList.date, reservedList.name, reservedList.count, reservedList.boxCount);
+            _saveToStorage(arrOfObj);
 
             // Input 초기화
-
             orgName.value = '';
             kind1.checked = true;
             count.value = 0;
             boxCount.value = 0;
+
+            // modal 창 off
+            _closeModal();
+
         }
     }
+
+
+    // localStorage 저장 및 호출을 위한 unique id 생성 함수
+
+    function uuidv4() {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+          return v.toString(16);
+        });
+      }
 
 
     function _submitClick(e) {
