@@ -2,14 +2,32 @@
     let today = new Date();
     const calTable = document.querySelector('.calTable');
 
-    _makeCalendar();
+    if(!localStorage.getItem('arrOfObj')){
+        let arrOfObj = [];
+        _saveToStorage(arrOfObj);
+    }
 
+    _makeCalendarFrame();
+    
+    // localStorage 초기화 버튼
+    const title = document.querySelector('.title');
+    title.addEventListener('click', _clearLocalStorage);
+    
+    function _clearLocalStorage(){
+        if(confirm('초기화 하겠습니까?')){
+            localStorage.clear();
+        } else {
+
+        }
+    }
+
+    // localStorage에 arr 저장
     function _saveToStorage(arr) {
         localStorage.setItem('arrOfObj', JSON.stringify(arr));
     }
 
 
-    function _makeCalendar() {
+    function _makeCalendarFrame() {
         let nowYear = today.getFullYear();
         const nowMonth = today.getMonth() + 1;
         const firstDay = new Date(nowYear, nowMonth - 1, 1);
@@ -70,6 +88,24 @@
             calTable.removeChild(calTable.lastChild);
         }
         _setOpenModal();
+        _addMain(nowYear, nowMonth);
+        
+    }
+
+    // 메인 달력에 추가하는 함수
+    function _addMain(year, month) {
+        const dateRow = document.querySelectorAll('.dateRow')
+        const arrOfObj = JSON.parse(localStorage.getItem('arrOfObj'));
+        const thisPageList = [];
+
+        for (let i = 0; i < arrOfObj.length; i++){
+            if(arrOfObj[i].date.split('-')[0] == year && arrOfObj[i].date.split('-')[1] == month){
+                thisPageList.push(arrOfObj[i]);
+            }
+        };
+
+        console.log(thisPageList);
+
     }
 
 
@@ -96,16 +132,21 @@
     monthUpBtn.addEventListener('click', _monthUp);
     monthDownBtn.addEventListener('click', _monthDown);
 
-    function _yearUp() {
-        let nowYear = today.getFullYear();
-        let nowMonth = today.getMonth();
-        today = new Date(nowYear + 1, nowMonth, 1);
+    // calendarFrame 삭제
+    function _deleteFrame() {
         const rowCount = calTable.childElementCount - 1;
         for (let i = 1; i <= rowCount; i++) {
             const dateRow = document.querySelector('.dateRow');
             calTable.removeChild(dateRow);
         }
-        _makeCalendar();
+    }
+
+    function _yearUp() {
+        let nowYear = today.getFullYear();
+        let nowMonth = today.getMonth();
+        today = new Date(nowYear + 1, nowMonth, 1);
+        _deleteFrame();
+        _makeCalendarFrame();
         _showYearMonth();
 
     };
@@ -114,12 +155,8 @@
         let nowYear = today.getFullYear();
         let nowMonth = today.getMonth();
         today = new Date(nowYear - 1, nowMonth, 1);
-        const rowCount = calTable.childElementCount - 1;
-        for (let i = 1; i <= rowCount; i++) {
-            const dateRow = document.querySelector('.dateRow');
-            calTable.removeChild(dateRow);
-        }
-        _makeCalendar();
+        _deleteFrame();
+        _makeCalendarFrame();
         _showYearMonth();
     }
 
@@ -132,7 +169,7 @@
             const dateRow = document.querySelector('.dateRow');
             calTable.removeChild(dateRow);
         }
-        _makeCalendar();
+        _makeCalendarFrame();
         _showYearMonth();
     }
 
@@ -145,7 +182,7 @@
             const dateRow = document.querySelector('.dateRow');
             calTable.removeChild(dateRow);
         }
-        _makeCalendar();
+        _makeCalendarFrame();
         _showYearMonth();
     }
 
@@ -203,8 +240,6 @@
 
     // submit 버튼 눌렀을 때 이벤트 & 객체 생성
 
-    const arrOfObj = [];
-
     function Reserved(name, date, kind, count, boxCount, returnDate) {
         this.name = name;
         this.date = date;
@@ -225,24 +260,31 @@
     submitBtn.addEventListener('click', _submitClick);
 
     function _submit(date) {
+        arrOfObj = JSON.parse(localStorage.getItem('arrOfObj'));
+
         if (orgName.value) {
             // 객체 생성
+            const currentYear = document.querySelector('.year').innerText;
+            const currentMonth = document.querySelector('.month').innerText;
             const theDate = date.substring(date.lastIndexOf('월') + 2, date.lastIndexOf('일'));
-            const reservedList = new Reserved(orgName.value, today.toISOString().substring(0, 8) + theDate, (kind1.checked ? '(구)' : '(신)'), count.value, boxCount.value, returnDate.value);
+            const reservedList = new Reserved(orgName.value, currentYear + '-' + currentMonth + '-' + theDate, (kind1.checked ? '(구)' : '(신)'), count.value, boxCount.value, returnDate.value);
 
             // 객체 배열에 추가 후 localStorage에 저장
             arrOfObj.push(reservedList);
-
             _saveToStorage(arrOfObj);
-
+            
             // Input 초기화
             orgName.value = '';
             kind1.checked = true;
             count.value = 0;
             boxCount.value = 0;
-
-            // modal 창 off
+            
+            // modal창 꺼지도록
             _closeModal();
+            
+            // 메인 달력 초기화 및 추가
+            _deleteFrame();
+            _makeCalendarFrame();
 
         }
     }
@@ -289,30 +331,6 @@
             }
         }
     });
-
-
-
-    // 메인 달력에 추가하는 함수
-    function _addMain(date, name, count, boxCount) {
-        // 인수로 날짜를 받아서 메인 달력의 해당 날짜에 추가되도록 함.
-        const dateRow = document.querySelectorAll('.dateRow')
-        const theDate = date.substring(8, 10);
-
-        for (let i = 0; i < 5; i++) {
-            for (let j = 0; j < 7; j++) {
-                if (dateRow[i].children[j].childNodes[0]) {
-                    if (dateRow[i].children[j].childNodes[0].innerText == theDate) {
-                        const correctElement = dateRow[i].children[j].childNodes[0];
-                        const list = document.createElement('div');
-                        list.classList.add('list');
-                        list.innerHTML = name + '<br>-기표대 ' + count + '개 <br>-투표함' + boxCount + '개'
-                        correctElement.parentNode.appendChild(list);
-                    }
-                }
-            }
-        }
-    }
-
 
 
     // delete 버튼 누를 시 해당 리스트 삭제
