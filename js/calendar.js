@@ -25,11 +25,11 @@
     function _saveToStorage(arr) {
         localStorage.setItem('arrOfObj', JSON.stringify(arr));
     }
-
-
+    
+    
     function _makeCalendarFrame() {
         let nowYear = today.getFullYear();
-        const nowMonth = today.getMonth() + 1;
+        let nowMonth = today.getMonth() + 1;
         const firstDay = new Date(nowYear, nowMonth - 1, 1);
         const firstDayOfWeek = firstDay.getDay();
         const lastDay = new Date(nowYear, nowMonth, 0);
@@ -87,7 +87,6 @@
         if (!lastTr) {
             calTable.removeChild(calTable.lastChild);
         }
-        _setOpenModal();
         _addMain(nowYear, nowMonth);
         
     }
@@ -95,6 +94,8 @@
     // 메인 달력에 추가하는 함수
     function _addMain(year, month) {
         const dateRow = document.querySelectorAll('.dateRow')
+
+        // 지금 달력의 년도, 월에 맞는 데이터만 추출
         const arrOfObj = JSON.parse(localStorage.getItem('arrOfObj'));
         const thisPageList = [];
 
@@ -104,12 +105,67 @@
             }
         };
 
-        console.log(thisPageList);
+        _setOpenModal();
+        
+        localStorage.setItem('thisPageList', JSON.stringify(thisPageList));
+    }
+    
+    // 날짜가 입력된 칸만 event 지정되도록 설정
+    function _setOpenModal() {
+        const dateColumn = document.querySelectorAll('.dateColumn');
+        for (let i = 0; i < dateColumn.length; i++) {
+            if(dateColumn[i].childNodes[0]){
+                dateColumn[i].addEventListener('click', _clickColumn);
+            }
+        }
+    }
+    
+    
+    function _clickColumn(e) {
+        if(e.target.className == 'list'){
+            
+        } else if (e.target.className == 'date'){
+            _openModal(e.target.innerText);
+        } else if (e.target.className == 'dateColumn'){
+            _openModal(e.target.childNodes[0].innerText);
+        }
+        
+        orgName.focus();
+    }
+    
+    const modalContainer = document.querySelector('.dark');
+    const clickedDate = document.querySelector('.clickedDate');
+    const orgName = document.getElementById('orgName');
+    const returnDate = document.getElementById('returnDate');
+    const listContainer = document.querySelector('.listContainer');
 
+    function _openModal(date){
+        modalContainer.classList.add('opened');
+        const nowYear = today.getFullYear();
+        const nowMonth = today.getMonth() + 1;
+        const thisPageList = JSON.parse(localStorage.getItem('thisPageList'));
+
+        clickedDate.innerText = nowYear + '년 ' + nowMonth + '월 ' + date + '일';
+
+        for (let i = 0; i < thisPageList.length; i++){
+            if(thisPageList[i].date.split('-')[2] == date){
+                const resList = document.createElement('div');
+                resList.classList.add('resList');
+                resList.innerHTML =
+                "<div class='resName'>" + thisPageList[i].name + "</div>" +
+                "<div class='count'><p class='resKind'>" + thisPageList[i].kind + "</p>" +
+                " 기표대:<p class='resCount'>" + thisPageList[i].count + "</p>개, 투표함: <p class='resBoxCount'>" +
+                thisPageList[i].boxCount + "</p>개</div>" + "<div class='resDate'>반납예정일: <p class='returnDate'>" +
+                thisPageList[i].returnDate + "</p></div>" + "<div class='deleteBtn'><i class='fas fa-trash-alt'></i></div>"
+
+                listContainer.appendChild(resList);
+            }
+        };
+        console.log(thisPageList);
     }
 
-
-    _showYearMonth(today);
+    // 달력 오른쪽 상단 year, month 표시
+    _showYearMonth();
 
     function _showYearMonth() {
         const nowYear = today.getFullYear();
@@ -187,42 +243,6 @@
     }
 
 
-    // 모달창
-
-    // 달력 클릭 시 이벤트
-    const modalContainer = document.querySelector('.dark');
-    const clickedDate = document.querySelector('.clickedDate');
-    const orgName = document.getElementById('orgName');
-    const returnDate = document.getElementById('returnDate');
-
-    _setOpenModal();
-
-    function _setOpenModal() {
-        const dateColumn = document.querySelectorAll('.dateColumn');
-        for (let i = 0; i < dateColumn.length; i++) {
-            if (dateColumn[i].innerHTML) {
-                dateColumn[i].addEventListener('click', _openModal);
-            }
-        }
-    }
-
-    function _openModal(e) {
-        let nowYear = today.getFullYear();
-        let nowMonth = today.getMonth() + 1;
-        modalContainer.classList.add('opened');
-        if (e.target.className == 'dateColumn') {
-            clickedDate.innerHTML = nowYear + '년 ' + nowMonth + '월 ' + e.target.childNodes[0].innerText + '일';
-            returnDate.value = today.toISOString().substring(0, 8) + (e.target.childNodes[0].innerText.length == 1 ? '0' + e.target.childNodes[0].innerText : e.target.childNodes[0].innerText);
-        } else if (e.target.className == 'date') {
-            clickedDate.innerHTML = nowYear + '년 ' + nowMonth + '월 ' + e.target.innerText + '일';
-            returnDate.value = today.toISOString().substring(0, 8) + (e.target.innerText.length == 1 ? '0' + e.target.innerText : e.target.innerText);
-        } else if (e.target.className == 'list') {
-            clickedDate.innerHTML = nowYear + '년 ' + nowMonth + '월 ' + e.target.parentNode.childNodes[0].innerText + '일';
-            returnDate.value = today.toISOString().substring(0, 8) + (e.target.parentNode.childNodes[0].innerText.length == 1 ? '0' + e.target.parentNode.childNodes[0].innerText : e.target.parentNode.childNodes[0].innerText);
-        }
-        orgName.focus();
-    }
-
     // close 버튼 & esc 키
     const closeBtn = document.querySelector('.close');
 
@@ -230,6 +250,9 @@
 
     function _closeModal() {
         modalContainer.classList.remove('opened');
+        while (listContainer.firstChild){
+            listContainer.removeChild(listContainer.firstChild);
+        }
     }
 
     window.addEventListener('keydown', function (e) {
@@ -254,7 +277,6 @@
     const kind1 = document.getElementById('kind1');
     const count = document.getElementById('count');
     const boxCount = document.getElementById('boxCount');
-    const listContainer = document.querySelector('.listContainer');
 
 
     submitBtn.addEventListener('click', _submitClick);
