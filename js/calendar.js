@@ -2,19 +2,19 @@
     let today = new Date();
     const calTable = document.querySelector('.calTable');
 
-    if(!localStorage.getItem('arrOfObj')){
+    if (!localStorage.getItem('arrOfObj')) {
         let arrOfObj = [];
         _saveToStorage(arrOfObj);
     }
 
     _makeCalendarFrame();
-    
+
     // localStorage 초기화 버튼
     const title = document.querySelector('.title');
     title.addEventListener('click', _clearLocalStorage);
-    
-    function _clearLocalStorage(){
-        if(confirm('초기화 하겠습니까?')){
+
+    function _clearLocalStorage() {
+        if (confirm('초기화 하겠습니까?')) {
             localStorage.clear();
         } else {
 
@@ -25,8 +25,8 @@
     function _saveToStorage(arr) {
         localStorage.setItem('arrOfObj', JSON.stringify(arr));
     }
-    
-    
+
+
     function _makeCalendarFrame() {
         let nowYear = today.getFullYear();
         let nowMonth = today.getMonth() + 1;
@@ -88,80 +88,106 @@
             calTable.removeChild(calTable.lastChild);
         }
         _addMain(nowYear, nowMonth);
-        
+
     }
 
     // 메인 달력에 추가하는 함수
     function _addMain(year, month) {
-        const dateRow = document.querySelectorAll('.dateRow')
+        const dateColumn = document.querySelectorAll('.dateColumn')
 
         // 지금 달력의 년도, 월에 맞는 데이터만 추출
         const arrOfObj = JSON.parse(localStorage.getItem('arrOfObj'));
         const thisPageList = [];
+        console.log(arrOfObj);
 
-        for (let i = 0; i < arrOfObj.length; i++){
-            if(arrOfObj[i].date.split('-')[0] == year && arrOfObj[i].date.split('-')[1] == month){
+        for (let i = 0; i < arrOfObj.length; i++) {
+            if (arrOfObj[i].date.split('-')[0] == year && arrOfObj[i].date.split('-')[1] == month) {
                 thisPageList.push(arrOfObj[i]);
             }
         };
+        localStorage.setItem('thisPageList', JSON.stringify(thisPageList));
+
+        for (let i = 0; i < dateColumn.length; i++) {
+            if (dateColumn[i].childElementCount >= 1) {
+                for (let j = 0; j < thisPageList.length; j++) {
+                    if (dateColumn[i].childNodes[0].innerText == thisPageList[j].date.split('-')[2]) {
+                        const list = document.createElement('div');
+                        list.classList.add('list');
+                        list.innerHTML = thisPageList[j].name + '<br>-기표대 ' + thisPageList[j].count + '<br>-투표함 ' + thisPageList[j].boxCount;
+
+                        dateColumn[i].appendChild(list);
+                    }
+                }
+            }
+        }
 
         _setOpenModal();
-        
-        localStorage.setItem('thisPageList', JSON.stringify(thisPageList));
+
     }
-    
+
     // 날짜가 입력된 칸만 event 지정되도록 설정
     function _setOpenModal() {
         const dateColumn = document.querySelectorAll('.dateColumn');
         for (let i = 0; i < dateColumn.length; i++) {
-            if(dateColumn[i].childNodes[0]){
+            if (dateColumn[i].childNodes[0]) {
                 dateColumn[i].addEventListener('click', _clickColumn);
             }
         }
     }
-    
-    
+
+
     function _clickColumn(e) {
-        if(e.target.className == 'list'){
-            
-        } else if (e.target.className == 'date'){
+        if (e.target.className == 'list') {
+
+        } else if (e.target.className == 'date') {
             _openModal(e.target.innerText);
-        } else if (e.target.className == 'dateColumn'){
+        } else if (e.target.className == 'dateColumn') {
             _openModal(e.target.childNodes[0].innerText);
         }
-        
+
         orgName.focus();
     }
-    
+
     const modalContainer = document.querySelector('.dark');
     const clickedDate = document.querySelector('.clickedDate');
     const orgName = document.getElementById('orgName');
     const returnDate = document.getElementById('returnDate');
     const listContainer = document.querySelector('.listContainer');
 
-    function _openModal(date){
+    function _openModal(date) {
         modalContainer.classList.add('opened');
         const nowYear = today.getFullYear();
         const nowMonth = today.getMonth() + 1;
         const thisPageList = JSON.parse(localStorage.getItem('thisPageList'));
+        const thisModalList = [];
+
+        clickedDate.innerText = '';
 
         clickedDate.innerText = nowYear + '년 ' + nowMonth + '월 ' + date + '일';
-
-        for (let i = 0; i < thisPageList.length; i++){
-            if(thisPageList[i].date.split('-')[2] == date){
+        
+        // 좌측 리스트 영역 초기화
+        while (listContainer.firstChild) {
+            listContainer.removeChild(listContainer.firstChild);
+        }
+        
+        for (let i = 0; i < thisPageList.length; i++) {
+            if (thisPageList[i].date.split('-')[2] == date) {
                 const resList = document.createElement('div');
                 resList.classList.add('resList');
                 resList.innerHTML =
-                "<div class='resName'>" + thisPageList[i].name + "</div>" +
-                "<div class='count'><p class='resKind'>" + thisPageList[i].kind + "</p>" +
-                " 기표대:<p class='resCount'>" + thisPageList[i].count + "</p>개, 투표함: <p class='resBoxCount'>" +
-                thisPageList[i].boxCount + "</p>개</div>" + "<div class='resDate'>반납예정일: <p class='returnDate'>" +
-                thisPageList[i].returnDate + "</p></div>" + "<div class='deleteBtn'><i class='fas fa-trash-alt'></i></div>"
+                    "<div class='resName'>" + thisPageList[i].name + "</div>" +
+                    "<div class='count'><p class='resKind'>" + thisPageList[i].kind + "</p>" +
+                    " 기표대:<p class='resCount'>" + thisPageList[i].count + "</p>개, 투표함: <p class='resBoxCount'>" +
+                    thisPageList[i].boxCount + "</p>개</div>" + "<div class='resDate'>반납예정일: <p class='returnDate'>" +
+                    thisPageList[i].returnDate + "</p></div>" + "<div class='deleteBtn'><i class='fas fa-trash-alt'></i></div>"
 
                 listContainer.appendChild(resList);
+                thisModalList.push(thisPageList[i]);
             }
         };
-        console.log(thisPageList);
+
+        // deleteBtn 활성화
+        _activeDelete(thisModalList, date);
     }
 
     // 달력 오른쪽 상단 year, month 표시
@@ -250,9 +276,6 @@
 
     function _closeModal() {
         modalContainer.classList.remove('opened');
-        while (listContainer.firstChild){
-            listContainer.removeChild(listContainer.firstChild);
-        }
     }
 
     window.addEventListener('keydown', function (e) {
@@ -294,20 +317,17 @@
             // 객체 배열에 추가 후 localStorage에 저장
             arrOfObj.push(reservedList);
             _saveToStorage(arrOfObj);
-            
+
             // Input 초기화
             orgName.value = '';
             kind1.checked = true;
             count.value = 0;
             boxCount.value = 0;
-            
-            // modal창 꺼지도록
-            _closeModal();
-            
+
             // 메인 달력 초기화 및 추가
             _deleteFrame();
             _makeCalendarFrame();
-
+            _openModal(theDate);
         }
     }
 
@@ -315,11 +335,11 @@
     // localStorage 저장 및 호출을 위한 unique id 생성 함수
 
     function uuidv4() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-          var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-          return v.toString(16);
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
         });
-      }
+    }
 
 
     function _submitClick(e) {
@@ -335,8 +355,8 @@
                 };
             };
         };
-    }     
-        
+    }
+
     // modal 창에서 enter 키 누를 시 입력되도록
 
     const modal = document.querySelector('.modal');
@@ -346,9 +366,9 @@
             for (let i = 0; i < e.path.length; i++) {
                 if (e.path[i].className == 'modal') {
                     for (let j = 0; j < e.path[i].childNodes.length; j++)
-                    if (e.path[i].childNodes[j].className == 'submitBtn'){
-                        _submitClick(e);
-                    }
+                        if (e.path[i].childNodes[j].className == 'submitBtn') {
+                            _submitClick(e);
+                        }
                 }
             }
         }
@@ -356,41 +376,22 @@
 
 
     // delete 버튼 누를 시 해당 리스트 삭제
-    const listDelete = document.querySelector('.deleteBtn');
+    function _activeDelete(thisModalList, date) {
+        const deleteBtn = document.querySelectorAll('.deleteBtn');
+        let arrOfObj = JSON.parse(localStorage.getItem('arrOfObj'));
 
-    if (listDelete) {
-        _activeDelete(listDelete);
-    }
-
-    function _activeDelete(btn, listCon, date, name) {
-
-        const dateRow = document.querySelectorAll('.dateRow')
-        const theDate = date.substring(8, 10);
-
-        btn.addEventListener('click', function (e) {
-            if (e.target.nodeName == 'DIV') {
-                listCon.removeChild(e.target.parentNode);
-            } else if (e.target.nodeName == 'svg'){
-                listCon.removeChild(e.target.parentNode.parentNode);
-            } else if (e.target.nodeName == 'path'){
-                listCon.removeChild(e.target.parentNode.parentNode.parentNode);
-            }
-
-            for (let i = 0; i < 5; i++) {
-                for (let j = 0; j < 7; j++) {
-                    if (dateRow[i].children[j].childNodes[0]) {
-                        if (dateRow[i].children[j].childNodes[0].innerText == theDate) {
-                            for (let h = 0; h < dateRow[i].children[j].childNodes.length; h++) {
-                                if (dateRow[i].children[j].childNodes[h].innerText.includes(name)) {
-                                    dateRow[i].children[j].removeChild(dateRow[i].children[j].childNodes[h]);
-                                }
-                            }
-                        }
-                    }
+        for (let i = 0; i < deleteBtn.length; i++) {
+            deleteBtn[i].addEventListener('click', function (e) {
+                const idx = arrOfObj.findIndex(function (item) { return item.id === thisModalList[i].id });
+                if (idx > -1) {
+                    arrOfObj.splice(idx, 1);
                 }
-            }
-        })
-
+                _saveToStorage(arrOfObj);
+                _deleteFrame();
+                _makeCalendarFrame();
+                _openModal(date);
+            });
+        }
 
     }
 
