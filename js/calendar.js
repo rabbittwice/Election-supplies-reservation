@@ -113,6 +113,9 @@
                     if (dateColumn[i].childNodes[0].innerText == thisPageList[j].date.split('-')[2]) {
                         const list = document.createElement('div');
                         list.classList.add('list');
+                        if(thisPageList[j].checked){
+                            list.classList.add('checked');
+                        }
                         list.innerHTML = thisPageList[j].name + '<br>-기표대 ' + thisPageList[j].count + '<br>-투표함 ' + thisPageList[j].boxCount;
 
                         dateColumn[i].appendChild(list);
@@ -122,7 +125,7 @@
         }
 
         _setOpenModal();
-
+        _setCheckList();
     }
 
     // 날짜가 입력된 칸만 event 지정되도록 설정
@@ -135,7 +138,6 @@
         }
     }
 
-
     function _clickColumn(e) {
         if (e.target.className == 'list') {
 
@@ -146,6 +148,44 @@
         }
 
         orgName.focus();
+    }
+
+    // main 화면에서 list 클릭했을 때 표시하는 기능 (대여 여부)
+    function _setCheckList(){
+        const dateColumn = document.querySelectorAll('.dateColumn');
+        for (let i = 0; i < dateColumn.length; i++) {
+            if (dateColumn[i].childNodes[1]) {
+                _checkList(dateColumn[i].childNodes);
+            }
+        }
+    }
+
+    function _checkList(dateChilds){
+        let arrOfObj = JSON.parse(localStorage.getItem('arrOfObj'));
+        const thisPageList = JSON.parse(localStorage.getItem('thisPageList'));
+        const date = dateChilds[0].innerText;
+        const thisDateList = [];
+        
+        for (let i = 0; i < thisPageList.length; i++) {
+            if (thisPageList[i].date.split('-')[2] == date) {
+                thisDateList.push(thisPageList[i]);
+            }
+        };
+
+        for (let i = 1; i < dateChilds.length; i++){
+            dateChilds[i].addEventListener('click', function(e){
+                const idx = arrOfObj.findIndex(function (item) { return item.id === thisDateList[i-1].id });
+                if(arrOfObj[idx].checked){
+                    arrOfObj[idx].checked = false;
+                } else {
+                    arrOfObj[idx].checked = true;
+                }
+
+                _saveToStorage(arrOfObj);
+                _deleteFrame();
+                _makeCalendarFrame();
+            })
+        }
     }
 
     const modalContainer = document.querySelector('.dark');
@@ -294,6 +334,7 @@
         this.boxCount = boxCount;
         this.returnDate = returnDate;
         this.id = uuidv4();
+        this.checked = false;
     }
 
     const submitBtn = document.querySelector('.submitBtn');
@@ -312,7 +353,7 @@
             const currentYear = document.querySelector('.year').innerText;
             const currentMonth = document.querySelector('.month').innerText;
             const theDate = date.substring(date.lastIndexOf('월') + 2, date.lastIndexOf('일'));
-            const reservedList = new Reserved(orgName.value, currentYear + '-' + currentMonth + '-' + theDate, (kind1.checked ? '(구)' : '(신)'), count.value, boxCount.value, returnDate.value);
+            const reservedList = new Reserved(orgName.value, currentYear + '-' + currentMonth + '-' + theDate, (kind1.checked ? '(구)' : '(신)'), count.value, boxCount.value, returnDate.value, false);
 
             // 객체 배열에 추가 후 localStorage에 저장
             arrOfObj.push(reservedList);
