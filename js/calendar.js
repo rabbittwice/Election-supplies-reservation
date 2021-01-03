@@ -21,6 +21,29 @@
         }
     }
 
+    function _insertCountInfo(countInfo){
+        const totalOldBooth = document.querySelector('.totalOldBooth'),
+            totalNewBooth = document.querySelector('.totalNewBooth'),
+            totalBox = document.querySelector('.totalBox');
+
+        totalOldBooth.innerText = countInfo[0];
+        totalNewBooth.innerText = countInfo[1];
+        totalBox.innerText = countInfo[2];
+    }
+
+    if (localStorage.getItem('countInfo')) {
+        const countInfo = JSON.parse(localStorage.getItem('countInfo'));
+        _insertCountInfo(countInfo);
+    } else {
+        const totalOldBooth = Number(prompt('총 구형 기표대는 몇 개인가요? (숫자만 입력, 수정 가능)'));
+        const totalNewBooth = Number(prompt('총 신형 기표대는 몇 개인가요? (숫자만 입력, 수정 가능)'));
+        const totalBox = Number(prompt('총 투표함은 몇 개인가요? (숫자만 입력, 수정 가능)'));
+        const countInfo = [];
+        countInfo.push(totalOldBooth, totalNewBooth, totalBox);
+        localStorage.setItem('countInfo', JSON.stringify(countInfo));
+        _insertCountInfo(countInfo);
+    }
+
     // localStorage에 arr 저장
     function _saveToStorage(arr) {
         localStorage.setItem('arrOfObj', JSON.stringify(arr));
