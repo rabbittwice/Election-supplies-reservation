@@ -31,6 +31,7 @@
         totalBox.innerText = countInfo[2];
     }
 
+    // 총 개수 배열로 입력
     if (localStorage.getItem('countInfo')) {
         const countInfo = JSON.parse(localStorage.getItem('countInfo'));
         _insertCountInfo(countInfo);
@@ -42,6 +43,27 @@
         countInfo.push(totalOldBooth, totalNewBooth, totalBox);
         localStorage.setItem('countInfo', JSON.stringify(countInfo));
         _insertCountInfo(countInfo);
+    }
+
+    function _insertCurrentCount(currentCount){
+        console.log(currentCount);
+        const rentableOldBooth = document.querySelector('.rentableOldBooth'),
+            rentableNewBooth = document.querySelector('.rentableNewBooth'),
+            rentableBox = document.querySelector('.rentableBox');
+
+        rentableOldBooth.innerText = currentCount[0];
+        rentableNewBooth.innerText = currentCount[1];
+        rentableBox.innerText = currentCount[2];
+    }
+
+    // 대여 가능한 개수 불러오기
+    if (localStorage.getItem('currentCount')){
+        const currentCount = JSON.parse(localStorage.getItem('currentCount'));
+        _insertCurrentCount(currentCount);
+    } else {
+        const currentCount = JSON.parse(localStorage.getItem('countInfo'));
+        console.log(currentCount, '대여 가능한 수');
+        localStorage.setItem('currentCount', JSON.stringify(currentCount));
     }
 
     // localStorage에 arr 저장
@@ -121,7 +143,7 @@
         // 지금 달력의 년도, 월에 맞는 데이터만 추출
         const arrOfObj = JSON.parse(localStorage.getItem('arrOfObj'));
         const thisPageList = [];
-        console.log(arrOfObj);
+        console.log(arrOfObj, '현재 저장된 리스트들');
 
         for (let i = 0; i < arrOfObj.length; i++) {
             if (arrOfObj[i].date.split('-')[0] == year && arrOfObj[i].date.split('-')[1] == month) {
@@ -381,6 +403,19 @@
             // 객체 배열에 추가 후 localStorage에 저장
             arrOfObj.push(reservedList);
             _saveToStorage(arrOfObj);
+            
+            // currentInfo 생성 및 적용
+            const currentCount = JSON.parse(localStorage.getItem('currentCount'));
+
+            if(kind1.checked){
+                currentCount[0] = currentCount[0] - count.value;
+            } else {
+                currentCount[1] = currentCount[1] - count.value;
+            }
+            currentCount[2] = currentCount[2] - boxCount.value;
+            
+            localStorage.setItem('currentCount', JSON.stringify(currentCount));
+            
 
             // Input 초기화
             orgName.value = '';
@@ -438,6 +473,20 @@
         }
     });
 
+    // 리스트를 인자로 currentCount 개수 증가되는 함수
+    function _incCurCount(kind, count, boxCount){
+        const currentCount = JSON.parse(localStorage.getItem('currentCount'));
+        if(kind == '(구)'){
+            currentCount[0] = currentCount[0] + Number(count);
+        } else {
+            currentCount[1] = currentCount[1] + Number(count);
+        }
+        currentCount[2] = currentCount[2] + Number(boxCount);
+        
+        console.log(currentCount);
+        localStorage.setItem('currentCount', JSON.stringify(currentCount));
+    }
+
 
     // delete 버튼 누를 시 해당 리스트 삭제
     function _activeDelete(thisModalList, date) {
@@ -448,6 +497,7 @@
             deleteBtn[i].addEventListener('click', function (e) {
                 const idx = arrOfObj.findIndex(function (item) { return item.id === thisModalList[i].id });
                 if (idx > -1) {
+                    _incCurCount(arrOfObj[idx].kind, arrOfObj[idx].count, arrOfObj[idx].boxCount);
                     arrOfObj.splice(idx, 1);
                 }
                 _saveToStorage(arrOfObj);
