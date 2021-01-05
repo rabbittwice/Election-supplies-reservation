@@ -46,7 +46,6 @@
     }
 
     function _insertCurrentCount(currentCount){
-        console.log(currentCount);
         const rentableOldBooth = document.querySelector('.rentableOldBooth'),
             rentableNewBooth = document.querySelector('.rentableNewBooth'),
             rentableBox = document.querySelector('.rentableBox');
@@ -62,8 +61,8 @@
         _insertCurrentCount(currentCount);
     } else {
         const currentCount = JSON.parse(localStorage.getItem('countInfo'));
-        console.log(currentCount, '대여 가능한 수');
         localStorage.setItem('currentCount', JSON.stringify(currentCount));
+        _insertCurrentCount(currentCount)
     }
 
     // localStorage에 arr 저장
@@ -245,16 +244,26 @@
         const nowMonth = today.getMonth() + 1;
         const thisPageList = JSON.parse(localStorage.getItem('thisPageList'));
         const thisModalList = [];
+        const thisPageDate = new Date(nowYear, nowMonth - 1, Number(date));
+        const getTime = thisPageDate.getTime();
 
         clickedDate.innerText = '';
 
         clickedDate.innerText = nowYear + '년 ' + nowMonth + '월 ' + date + '일';
+
         
         // 좌측 리스트 영역 초기화
         while (listContainer.firstChild) {
             listContainer.removeChild(listContainer.firstChild);
         }
+
+        // 반납일 기본값 설정
+        const reDateInput = document.getElementById('returnDate');
+            // date input 기본값은 date가 -1이 돼서 인자로 받은 date에 +1을 해준다
+        const forReDate = new Date(nowYear, nowMonth - 1, Number(date) + 1);
+        reDateInput.valueAsDate = forReDate;
         
+        // 저장된 list 왼쪽 영역에 입력
         for (let i = 0; i < thisPageList.length; i++) {
             if (thisPageList[i].date.split('-')[2] == date) {
                 const resList = document.createElement('div');
@@ -270,6 +279,22 @@
                 thisModalList.push(thisPageList[i]);
             }
         };
+
+        // 대여할 수 있는 물품 개수 파악을 위해 모든 리스트들의 반납일과 클릭한 날짜를 비교해서 입력
+        const arrOfObj = JSON.parse(localStorage.getItem('arrOfObj'));
+        const currentCount = JSON.parse(localStorage.getItem('currentCount'));
+        for (let i = 0; i < arrOfObj.length; i++) {
+            const returnDates = new Date(arrOfObj[i].returnDate.split('-')[0], arrOfObj[i].returnDate.split('-')[1] - 1, arrOfObj[i].returnDate.split('-')[2])
+            if (returnDates.getTime() < getTime) {
+                if(arrOfObj[i].kind == "(구)"){
+                    currentCount[0] = currentCount[0] + Number(arrOfObj[i].count);
+                } else {
+                    currentCount[1] = currentCount[1] + Number(arrOfObj[i].count);
+                }
+                currentCount[2] = currentCount[2] + Number(arrOfObj[i].boxCount);
+            }
+        }
+        _insertCurrentCount(currentCount);
 
         // deleteBtn 활성화
         _activeDelete(thisModalList, date);
@@ -415,7 +440,7 @@
             currentCount[2] = currentCount[2] - boxCount.value;
             
             localStorage.setItem('currentCount', JSON.stringify(currentCount));
-            
+            _insertCurrentCount(currentCount);
 
             // Input 초기화
             orgName.value = '';
@@ -483,10 +508,9 @@
         }
         currentCount[2] = currentCount[2] + Number(boxCount);
         
-        console.log(currentCount);
         localStorage.setItem('currentCount', JSON.stringify(currentCount));
+        _insertCurrentCount(currentCount);
     }
-
 
     // delete 버튼 누를 시 해당 리스트 삭제
     function _activeDelete(thisModalList, date) {
