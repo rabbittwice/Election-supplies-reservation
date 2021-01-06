@@ -32,16 +32,20 @@
     }
 
     // 총 개수 배열로 입력
+    
     if (localStorage.getItem('countInfo')) {
         const countInfo = JSON.parse(localStorage.getItem('countInfo'));
         _insertCountInfo(countInfo);
     } else {
+        _askCountInfo();
+    }
+    function _askCountInfo() {    
         const totalOldBooth = Number(prompt('총 구형 기표대는 몇 개인가요? (숫자만 입력, 수정 가능)'));
         const totalNewBooth = Number(prompt('총 신형 기표대는 몇 개인가요? (숫자만 입력, 수정 가능)'));
         const totalBox = Number(prompt('총 투표함은 몇 개인가요? (숫자만 입력, 수정 가능)'));
         const countInfo = [];
         countInfo.push(totalOldBooth, totalNewBooth, totalBox);
-        localStorage.setItem('countInfo', JSON.stringify(countInfo));
+        localStorage.setItem('countInfo', JSON.stringify(countInfo));  
         _insertCountInfo(countInfo);
     }
 
@@ -395,7 +399,6 @@
     })
 
     // submit 버튼 눌렀을 때 이벤트 & 객체 생성
-
     function Reserved(name, date, kind, count, boxCount, returnDate) {
         this.name = name;
         this.date = date;
@@ -457,7 +460,6 @@
 
 
     // localStorage 저장 및 호출을 위한 unique id 생성 함수
-
     function uuidv4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
@@ -467,7 +469,6 @@
 
 
     function _submitClick(e) {
-
         if (e.type == 'click') {
             const date = e.path[1].childNodes[1].innerText;
             _submit(date);
@@ -482,7 +483,6 @@
     }
 
     // modal 창에서 enter 키 누를 시 입력되도록
-
     const modal = document.querySelector('.modal');
 
     modal.addEventListener('keydown', function (e) {
@@ -511,6 +511,22 @@
         localStorage.setItem('currentCount', JSON.stringify(currentCount));
         _insertCurrentCount(currentCount);
     }
+
+    // 재설정 btn 클릭 시 countInfo 다시 입력
+    const resetCountBtn = document.querySelector('.resetCount');
+    resetCountBtn.addEventListener('click', function(e){
+        modalContainer.classList.remove('opened');
+        const beforeInfo = JSON.parse(localStorage.getItem('countInfo'));
+        localStorage.removeItem('countInfo')
+        _askCountInfo();
+        const afterInfo = JSON.parse(localStorage.getItem('countInfo'));
+        const currentCount = JSON.parse(localStorage.getItem('currentCount'));
+        for(let i = 0; i < 4; i++){
+            currentCount[i] = currentCount[i] - (beforeInfo[i] - afterInfo[i]);
+        }
+        localStorage.setItem('currentCount', JSON.stringify(currentCount));
+
+    });
 
     // delete 버튼 누를 시 해당 리스트 삭제
     function _activeDelete(thisModalList, date) {

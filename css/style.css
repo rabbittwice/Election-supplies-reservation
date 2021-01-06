@@ -3,6 +3,12 @@
 }
 body {
     background-color: #436979;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
 }
 .container {
     width: 100%;
@@ -197,6 +203,21 @@ body {
     border-radius: 8px;
     box-shadow: 3px 3px 0px 0px rgba(0, 0, 0, 0.74);
     color: black;
+}
+.resetCount {
+    position: absolute;
+    padding: 2px 2px;
+    right: 215px;
+    top: 25px;
+    color: white;
+    font-size: 11px;
+    border: 1px solid white;
+    border-radius: 5px;
+    cursor: pointer;
+}
+.resetCount:active {
+    background-color: azure;
+    color: rgb(0, 0, 0);
 }
 .countInfoBox {
     position: absolute;
