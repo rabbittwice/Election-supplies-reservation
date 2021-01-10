@@ -9,18 +9,6 @@
 
     _makeCalendarFrame();
 
-    // localStorage 초기화 버튼
-    const title = document.querySelector('.title');
-    title.addEventListener('click', _clearLocalStorage);
-
-    function _clearLocalStorage() {
-        if (confirm('초기화 하겠습니까?')) {
-            localStorage.clear();
-        } else {
-
-        }
-    }
-
     function _insertCountInfo(countInfo){
         const totalOldBooth = document.querySelector('.totalOldBooth'),
             totalNewBooth = document.querySelector('.totalNewBooth'),
